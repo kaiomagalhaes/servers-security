@@ -76,6 +76,7 @@
       ufw: rule=allow port={{ item }}
       with_items: "{{ port_to_be_opened }}"
 
+    #@TODO: discover why it keeps crashing
     - name: Restart server
       shell: reboot
       async: 0
