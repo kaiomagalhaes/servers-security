@@ -8,6 +8,14 @@
 
     sshd_config: /etc/ssh/sshd_config
 
+    ubuntu_common_required_packages:
+      - ufw
+      - fail2ban
+      - unattended-upgrades
+      - logwatch
+
+    ubuntu_common_ssh_port: 368
+
   gather_facts: no
 
   pre_tasks:
@@ -39,8 +47,33 @@
     - name: Disable empty password login
       lineinfile: dest={{ sshd_config }} regexp="^#?PermitEmptyPasswords" line="PermitEmptyPasswords no"
 
-    - name: Disable remote root login
-      lineinfile: dest={{ sshd_config }} regexp="^#?PermitRootLogin" line="PermitRootLogin no"
+#    - name: Disable remote root login
+#      lineinfile: dest={{ sshd_config }} regexp="^#?PermitRootLogin" line="PermitRootLogin no"
 
     - name: Disable password login
       lineinfile: dest={{ sshd_config }} regexp="^#?PasswordAuthentication" line="PasswordAuthentication no"
+
+    - name: Install required packages
+      apt: state=installed pkg={{ item }}
+      with_items: "{{ ubuntu_common_required_packages }}"
+
+    - name: Configure automatic updates
+      copy: src=apt_periodic dest=/etc/apt/apt.conf.d/10periodic
+
+    - name: Setup ufw
+      ufw: state=enabled policy=deny
+
+    - name: Allow ssh traffic
+      ufw: rule=allow port={{ ubuntu_common_ssh_port }} proto=tcp
+
+    - name: Change ssh port
+      lineinfile: dest=/etc/ssh/sshd_config
+                  regexp="^Port\s"
+                  line="Port {{ ubuntu_common_ssh_port }}"
+                  state=present
+
+#    - name: Restart server
+#      shell: reboot
+#      async: 0
+#      poll: 0
+#      ignore_errors: true
