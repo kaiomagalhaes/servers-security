@@ -1,0 +1,29 @@
+- name: main
+  remote_user: root
+  hosts: server_to_be_secured
+  vars:
+    server_manager_user: deploy
+    github_user: kaiomagalhaes
+
+  gather_facts: no
+
+  pre_tasks:
+    - raw: sudo apt-get -y install python-simplejson
+
+  tasks:
+    - name: Upgrade packages
+      apt:
+        update_cache: yes
+        upgrade: dist
+
+    - name: Create {{ server_manager_user }} user
+      user: name={{ server_manager_user }}
+            state=present
+            shell=/bin/bash
+            generate_ssh_key=yes
+
+    - name: Set authorized key took from github using the user {{ github_user }}
+      authorized_key:
+        user: "{{ server_manager_user }}"
+        state: present
+        key: https://github.com/{{ github_user }}.keys
