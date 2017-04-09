@@ -27,3 +27,6 @@
         user: "{{ server_manager_user }}"
         state: present
         key: https://github.com/{{ github_user }}.keys
+
+    - name: Change permission of the .ssh/authorized_keys to 400
+      file: dest=/home/deploy/.ssh/authorized_keys  mode=400
