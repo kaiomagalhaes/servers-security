@@ -3,6 +3,7 @@
   hosts: server_to_be_secured
   vars:
     server_manager_user: deploy
+    server_manager_user_password: pipoca
     github_user: kaiomagalhaes
 
   gather_facts: no
@@ -18,9 +19,11 @@
 
     - name: Create {{ server_manager_user }} user
       user: name={{ server_manager_user }}
+            password={{ server_manager_user_password }}
             state=present
             shell=/bin/bash
             generate_ssh_key=yes
+            groups="sudo"
 
     - name: Set authorized key took from github using the user {{ github_user }}
       authorized_key:
