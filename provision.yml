@@ -3,8 +3,8 @@
   hosts: server_to_be_secured
   vars:
     server_manager_user: deploy
-    # @TODO: discover why the password doesn't work
-    server_manager_user_password: pipoca
+    server_manager_user_password: my_name_is_willie
+
     github_user: kaiomagalhaes
 
     sshd_config: /etc/ssh/sshd_config
@@ -32,8 +32,8 @@
         upgrade: dist
 
     - name: Create {{ server_manager_user }} user
-      user: name={{ server_manager_user }}
-            password={{server_manager_user_password}}
+      user: name="{{ server_manager_user }}"
+            password="{{ server_manager_user_password | password_hash('sha512') }}"
             state=present
             shell=/bin/bash
             generate_ssh_key=yes
@@ -64,11 +64,11 @@
     - name: Configure automatic updates
       copy: src=apt_periodic dest=/etc/apt/apt.conf.d/10periodic
 
+    - name: Allow ssh traffic on the new ssh port
+      ufw: rule=allow port="{{ ubuntu_common_ssh_port }}" proto=tcp
+
     - name: Change ssh port
       lineinfile: dest=/etc/ssh/sshd_config regexp="^Port\s" line="Port {{ubuntu_common_ssh_port}}" state=present
-
-    - name: Allow ssh traffic
-      ufw: rule=allow port="{{ ubuntu_common_ssh_port }}" proto=tcp
 
     - name: Setup ufw
       ufw: state=enabled policy=reject
@@ -77,9 +77,18 @@
       ufw: rule=allow port={{ item }}
       with_items: "{{ port_to_be_opened }}"
 
-    #@TODO: discover why it keeps crashing
-    - name: Restart server
-      shell: reboot
-      async: 0
+    - name: restart server
+      shell: sleep 2 && shutdown -r now
+      async: 1
       poll: 0
+      sudo: false
       ignore_errors: true
+
+    - name: waiting for server to come back after reboot
+      local_action:
+          module: wait_for
+            host={{ inventory_hostname }}
+            port={{ ubuntu_common_ssh_port }}
+            delay=1
+            timeout=45
+      sudo: false
