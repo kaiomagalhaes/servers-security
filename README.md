@@ -17,9 +17,9 @@ This is an Ansible project that aims to setup the security generic related sever
 7. Disables remote root login
 8. Installs a set of basic security packages like:
 
-  8.1.  ufw
-  8.2. fail2ban
-  8.3. unattended-upgrades
+  1.  ufw
+  2. fail2ban
+  3. unattended-upgrades
   
 9. Configures automatic updates
 10. Change ssh port to 300 ( you can change it on the variables.yml )
