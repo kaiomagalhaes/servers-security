@@ -4,6 +4,6 @@ ubuntu_common_ssh_port: 300
 
 github_user: kaiomagalhaes
 
-port_to_be_opened:
+ports_to_be_opened:
   - 80
   - 443

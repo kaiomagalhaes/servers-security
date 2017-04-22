@@ -66,7 +66,7 @@
 
     - name: Open ufw ports
       ufw: rule=allow port={{ item }}
-      with_items: "{{ port_to_be_opened }}"
+      with_items: "{{ ports_to_be_opened }}"
 
     - name: restart server
       shell: sleep 2 && shutdown -r now
