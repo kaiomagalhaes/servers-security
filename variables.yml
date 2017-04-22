@@ -1,0 +1,9 @@
+server_manager_user: deploy
+server_manager_user_password: my_name_is_willie
+ubuntu_common_ssh_port: 300
+
+github_user: kaiomagalhaes
+
+port_to_be_opened:
+  - 80
+  - 443
