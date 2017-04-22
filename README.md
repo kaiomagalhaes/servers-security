@@ -16,6 +16,7 @@ This is an Ansible project that aims to setup the security generic related sever
 6. Disables password login
 7. Disables remote root login
 8. Installs a set of basic security packages like:
+
   8.1.  ufw
   8.2. fail2ban
   8.3. unattended-upgrades
