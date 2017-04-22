@@ -14,7 +14,7 @@
   gather_facts: no
 
   pre_tasks:
-    - raw: sudo apt-get -y install python-simplejson
+    - raw: apt-get -y install python-simplejson
 
   tasks:
     - name: Upgrade packages
@@ -30,11 +30,12 @@
             generate_ssh_key=yes
             groups="sudo"
 
-    - name: Set authorized key took from github using the user {{ github_user }}
+    - name: Set authorized key took from github using the users in github_users variable
+      with_items: "{{ github_users }}"
       authorized_key:
         user: "{{ server_manager_user }}"
         state: present
-        key: https://github.com/{{ github_user }}.keys
+        key: https://github.com/{{ item }}.keys
 
     - name: Change permission of the .ssh/authorized_keys to 400
       file: dest=/home/deploy/.ssh/authorized_keys  mode=400
